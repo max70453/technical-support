@@ -10,6 +10,7 @@ function initProvider() {
     updateAnalytics();
     setCurrentDate();
     renderAllTickets();
+    updateClientsTable();
 }
 
 function loadTickets() {
@@ -103,6 +104,25 @@ function renderAllTickets(filter) {
     }).join('');
 }
 
+function updateClientsTable() {
+    var tbody = document.getElementById('clientsTable');
+    if (!tbody) return;
+    
+    var searchQuery = document.getElementById('clientSearch') ? document.getElementById('clientSearch').value.toLowerCase() : '';
+    var filtered = searchQuery ? allClients.filter(function(c) {
+        return c.name.toLowerCase().indexOf(searchQuery) !== -1 || c.email.toLowerCase().indexOf(searchQuery) !== -1;
+    }) : allClients;
+    
+    tbody.innerHTML = filtered.map(function(c) {
+        var statusClass = c.status === 'active' ? 'status-resolved' : 'status-closed';
+        return '<tr><td>#' + c.id + '</td><td>' + c.name + '</td><td>' + c.email + '</td><td>' + c.tariff + '</td><td>' + c.balance + ' ₽</td><td><span class="status-badge ' + statusClass + '">' + (c.status === 'active' ? 'Активен' : 'Отключен') + '</span></td><td><button class="action-btn action-btn-secondary" onclick="viewCustomer(\'' + c.email + '\')">Открыть</button></td></tr>';
+    }).join('');
+}
+
+function searchClients() {
+    updateClientsTable();
+}
+
 function filterTickets(status) {
     var btns = document.querySelectorAll('.ticket-filter-btn');
     btns.forEach(function(btn) { btn.classList.remove('active'); });
@@ -158,8 +178,9 @@ function showCustomerCard(client) {
     }
     
     if (modal) {
-        console.log('Setting modal display flex, modal found:', modal.id);
         modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
     } else {
         console.log('Modal not found');
     }
@@ -183,7 +204,7 @@ function viewTicket(id) {
     if (!ticket) return;
     
     document.getElementById('modalTicketId').textContent = ticket.id;
-    document.getElementById('ticketDetails').innerHTML = '<div style="padding:16px;background:#f8fafc;border-radius:8px;margin-bottom:16px;"><div style="font-size:0.9rem;color:#64748b;margin-bottom:8px;">' + ticket.title + '</div><div style="font-weight:600;">' + (ticket.clientName || 'Клиент') + '</div><div style="color:#64748b;font-size:0.85rem;">' + (ticket.email || '-') + '</div></div>';
+    document.getElementById('ticketDetails').innerHTML = '<div style="padding:16px;background:#f8fafc;border-radius:8px;margin-bottom:16px;"><div style="font-size:0.9rem;color:#64748b;margin-bottom:8px;">' + ticket.title + '</div><div style="margin-bottom:8px;color:#334155;">' + (ticket.description || 'Нет описания') + '</div><div style="font-weight:600;">' + (ticket.clientName || 'Клиент') + '</div><div style="color:#64748b;font-size:0.85rem;">' + (ticket.email || '-') + '</div><div style="font-size:0.8rem;color:#64748b;margin-top:8px;">Тариф: ' + (ticket.tariff || '-') + ' | Баланс: ' + (ticket.balance || 0) + ' ₽</div></div>';
     
     var statusSelect = document.getElementById('statusSelect');
     if (statusSelect) statusSelect.value = ticket.status;
@@ -191,7 +212,23 @@ function viewTicket(id) {
     var replyText = document.getElementById('replyText');
     if (replyText) replyText.value = '';
     
-    document.getElementById('ticketModal').style.display = 'flex';
+    document.getElementById('ticketModal').style.display = 'block';
+    
+    var modalContent = document.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.style.position = 'fixed';
+        modalContent.style.left = '50%';
+        modalContent.style.top = '50%';
+        modalContent.style.transform = 'translate(-50%, -50%)';
+    }
+    
+    var btns = document.querySelectorAll('.status-btn');
+    btns.forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-status') === ticket.status) {
+            btn.classList.add('active');
+        }
+    });
 }
 
 function closeTicketDetail() {
@@ -220,15 +257,16 @@ function sendReply() {
     
     localStorage.setItem('netprovider_tickets', JSON.stringify(allTickets));
     
-    alert('Ответ отправлен');
+    showToast('Ответ отправлен');
     closeTicketDetail();
     updateDashboard();
+    renderAllTickets(currentFilter);
 }
 
 function updateTicketStatus() {
     if (!selectedTicketId) return;
     
-    var newStatus = document.getElementById('statusSelect').value;
+    var newStatus = document.getElementById('statusSelect') ? document.getElementById('statusSelect').value : currentFilter;
     var ticket = allTickets.find(function(t) { return t.id === selectedTicketId; });
     if (!ticket) return;
     
@@ -236,6 +274,29 @@ function updateTicketStatus() {
     localStorage.setItem('netprovider_tickets', JSON.stringify(allTickets));
     
     updateDashboard();
+    renderAllTickets(currentFilter);
+}
+
+function setTicketStatus(status) {
+    if (!selectedTicketId) return;
+    
+    var ticket = allTickets.find(function(t) { return t.id === selectedTicketId; });
+    if (!ticket) return;
+    
+    ticket.status = status;
+    localStorage.setItem('netprovider_tickets', JSON.stringify(allTickets));
+    
+    var btns = document.querySelectorAll('.status-btn');
+    btns.forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-status') === status) {
+            btn.classList.add('active');
+        }
+    });
+    
+    updateDashboard();
+    renderAllTickets(currentFilter);
+    showToast('Статус изменён');
 }
 
 function updateAnalytics() {

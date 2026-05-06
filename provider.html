@@ -63,9 +63,10 @@
         .action-btn-danger { background: #ef4444; color: white; }
         .quick-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9998; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: #ffffff; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9998; overflow-y: scroll; }
+        .modal-overlay.active { display: block; }
+        
+        .modal-content { background: #ffffff; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.1); position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); max-height: 80vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
         .modal-title { font-size: 1.3rem; font-weight: 700; }
         .modal-close { cursor: pointer; color: #64748b; }
@@ -77,8 +78,12 @@
         .reply-form textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 100px; }
         .reply-form textarea:focus { outline: none; border-color: #2563eb; }
         
-        .status-select { padding: 10px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; }
+        .status-select { position: relative; z-index: 10000; padding: 10px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; width: 100%; }
         .status-select:focus { outline: none; border-color: #2563eb; }
+        
+        .status-btn { padding: 8px 16px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .status-btn:hover { border-color: #2563eb; }
+        .status-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
         
         .template-chip { display: inline-block; padding: 6px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 4px; transition: all 0.2s; }
         .template-chip:hover { background: #2563eb; color: white; border-color: #2563eb; }
@@ -263,13 +268,13 @@
             </div>
             <div id="ticketDetails"></div>
             <div class="ticket-detail-section">
-                <div class="ticket-detail-label">Изменить статус</div>
-                <select class="status-select" id="statusSelect" onchange="updateTicketStatus()">
-                    <option value="new">Новая</option>
-                    <option value="progress">В работе</option>
-                    <option value="resolved">Решена</option>
-                    <option value="closed">Закрыта</option>
-                </select>
+                <div class="ticket-detail-label">Статус заявки</div>
+                <div id="statusButtons" style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="status-btn" data-status="new" onclick="setTicketStatus('new')">Новая</button>
+                    <button class="status-btn" data-status="progress" onclick="setTicketStatus('progress')">В работе</button>
+                    <button class="status-btn" data-status="resolved" onclick="setTicketStatus('resolved')">Решена</button>
+                    <button class="status-btn" data-status="closed" onclick="setTicketStatus('closed')">Закрыта</button>
+                </div>
             </div>
             <div class="ticket-detail-section">
                 <div class="ticket-detail-label">Ответ клиенту</div>
