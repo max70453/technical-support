@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход для сотрудников - MegaNet ТП</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card provider-login">
+            <div class="login-logo">
+                <i class="material-icons">support_agent</i>
+                <span>MegaNet ТП</span>
+            </div>
+            <div class="login-subtitle">Панель технической поддержки</div>
+            
+            <div class="login-form">
+                <div class="input-field">
+                    <input type="text" id="loginEmail" required>
+                    <label for="loginEmail">Логин</label>
+                </div>
+                <div class="input-field">
+                    <input type="password" id="loginPassword" required>
+                    <label for="loginPassword">Пароль</label>
+                </div>
+                <button class="btn btn-primary" onclick="handleLogin()">Войти</button>
+            </div>
+            
+            <div class="login-footer-links">
+                <a href="index.html" class="footer-link">Вернуться на главную</a>
+            </div>
+            
+            <div class="login-error" id="loginError" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <div id="toast" style="display:none;position:fixed;bottom:30px;right:30px;background:#10b981;border-radius:12px;padding:16px 24px;color:white;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+        <span id="toastMessage" style="font-weight:500;">Успешно!</span>
+    </div>
+    
+    <script src="js/app.js"></script>
+    <script>
+        function handleLogin() {
+            var login = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
+            var errorEl = document.getElementById('loginError');
+            
+            if (!login || !password) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            var operator = {
+                id: 1,
+                login: login,
+                name: 'Опер ' + login,
+                role: 'operator'
+            };
+            
+            localStorage.setItem('netprovider_operator', JSON.stringify(operator));
+            window.location.href = 'provider.html';
+        }
+
+        function showError(message) {
+            var errorEl = document.getElementById('loginError');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(function() {
+                errorEl.style.display = 'none';
+            }, 3000);
+        }
+
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            if (!toast) return;
+            
+            var toastMessage = document.getElementById('toastMessage');
+            if (toastMessage) toastMessage.textContent = message;
+            
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.style.display = 'block';
+            setTimeout(function() {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        var currentOperator = JSON.parse(localStorage.getItem('netprovider_operator'));
+        if (currentOperator) {
+            window.location.href = 'provider.html';
+        }
+    </script>
+</body>
+</html>

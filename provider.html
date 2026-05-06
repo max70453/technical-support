@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель ТП - MegaNet</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        nav { all: unset; display: block; }
+        .provider-layout { display: flex; min-height: 100vh; }
+        .provider-sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e2e8f0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .provider-sidebar-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; }
+        .provider-sidebar-header i { color: #2563eb; font-size: 32px; }
+        .provider-sidebar-header span { font-weight: 700; font-size: 1.1rem; color: #2563eb; }
+        .provider-menu { padding: 16px 0; background: #ffffff; }
+        .provider-menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #64748b; cursor: pointer; transition: all 0.2s; text-decoration: none !important; border: none; }
+        .provider-menu-item:hover { background: #f8fafc; color: #1e293b; text-decoration: none !important; }
+        .provider-menu-item.active { background: rgba(37, 99, 235, 0.15); color: #2563eb; font-weight: 600; text-decoration: none !important; }
+        .provider-menu-item i { font-size: 22px; }
+        .provider-main { margin-left: 260px; flex: 1; padding: 24px; background: #f8fafc; min-height: 100vh; }
+        .provider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .provider-header h1 { font-size: 1.8rem; font-weight: 700; color: #1e293b; }
+        .provider-header-right { display: flex; align-items: center; gap: 16px; }
+        .provider-sidebar-footer { position: absolute; bottom: 0; width: 260px; padding: 16px 20px; border-top: 1px solid #e2e8f0; background: #ffffff; }
+        .provider-operator { display: flex; align-items: center; gap: 12px; }
+        .provider-operator-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .provider-operator-info { flex: 1; }
+        .provider-operator-name { font-weight: 600; font-size: 0.9rem; }
+        .provider-operator-role { font-size: 0.8rem; color: #64748b; }
+        .stat-card-provider { background: #ffffff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 16px; }
+        .stat-card-provider .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .stat-card-provider .stat-icon i { font-size: 26px; color: white; }
+        .stat-card-provider .stat-info .stat-value { font-size: 1.8rem; font-weight: 700; color: #1e293b; }
+        .stat-card-provider .stat-info .stat-label { font-size: 0.9rem; color: #64748b; }
+        .provider-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .ticket-list-provider { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; }
+        .ticket-list-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-list-filters { display: flex; gap: 12px; flex-wrap: wrap; }
+        .ticket-filter-btn { padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: none; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; color: #64748b; }
+        .ticket-filter-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .ticket-table { width: 100%; border-collapse: collapse; }
+        .ticket-table th { text-align: left; padding: 14px 20px; font-size: 0.8rem; font-weight: 600; color: #64748b; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        .ticket-table td { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
+        .ticket-table tr:hover td { background: #f8fafc; }
+        .ticket-number { font-weight: 600; color: #2563eb; }
+        .ticket-client { font-weight: 500; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .status-new { background: #fef3c7; color: #b45309; }
+        .status-progress { background: #dbeafe; color: #1d4ed8; }
+        .status-resolved { background: #d1fae5; color: #047857; }
+        .status-closed { background: #e2e8f0; color: #64748b; }
+        .priority-high { color: #dc2626; font-weight: 600; }
+        .priority-normal { color: #64748b; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .action-btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+        .action-btn-primary { background: #2563eb; color: white; }
+        .action-btn-secondary { background: #f8fafc; color: #1e293b; }
+        .action-btn-success { background: #10b981; color: white; }
+        .action-btn-danger { background: #ef4444; color: white; }
+        .quick-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9998; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: #ffffff; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+        .modal-title { font-size: 1.3rem; font-weight: 700; }
+        .modal-close { cursor: pointer; color: #64748b; }
+        
+        .ticket-detail-section { margin-bottom: 20px; }
+        .ticket-detail-label { font-size: 0.8rem; color: #64748b; margin-bottom: 4px; }
+        .ticket-detail-value { font-weight: 500; }
+        
+        .reply-form textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 100px; }
+        .reply-form textarea:focus { outline: none; border-color: #2563eb; }
+        
+        .status-select { padding: 10px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; }
+        .status-select:focus { outline: none; border-color: #2563eb; }
+        
+        .template-chip { display: inline-block; padding: 6px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 4px; transition: all 0.2s; }
+        .template-chip:hover { background: #2563eb; color: white; border-color: #2563eb; }
+        
+        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .analytics-card { background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .analytics-card-title { font-weight: 600; margin-bottom: 16px; }
+        .analytics-bar { display: flex; align-items: center; margin-bottom: 12px; }
+        .analytics-bar-label { width: 100px; font-size: 0.9rem; color: #64748b; }
+        .analytics-bar-value { flex: 1; height: 24px; background: #e2e8f0; border-radius: 12px; overflow: hidden; }
+        .analytics-bar-fill { height: 100%; background: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 0.75rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="provider-layout">
+        <aside class="provider-sidebar">
+            <div class="provider-sidebar-header">
+                <i class="material-icons">support_agent</i>
+                <span>MegaNet ТП</span>
+            </div>
+            <nav class="provider-menu">
+                <a href="#" class="provider-menu-item active" onclick="showPage('dashboard')" style="color:#2563eb;">
+                    <i class="material-icons">dashboard</i> Дашборд
+                </a>
+                <a href="#" class="provider-menu-item" onclick="showPage('tickets')" style="color:#64748b;">
+                    <i class="material-icons">confirmation_number</i> Заявки
+                    <span style="margin-left:auto;background:#f59e0b;color:white;padding:2px 8px;border-radius:10px;font-size:0.75rem;" id="newTicketsBadge">0</span>
+                </a>
+                <a href="#" class="provider-menu-item" onclick="showPage('clients')" style="color:#64748b;">
+                    <i class="material-icons">people</i> Клиенты
+                </a>
+                <a href="#" class="provider-menu-item" onclick="showPage('equipment')" style="color:#64748b;">
+                    <i class="material-icons">dns</i> Оборудование
+                </a>
+                <a href="#" class="provider-menu-item" onclick="showPage('templates')" style="color:#64748b;">
+                    <i class="material-icons">text_snippet</i> Шаблоны
+                </a>
+                <a href="#" class="provider-menu-item" onclick="showPage('analytics')" style="color:#64748b;">
+                    <i class="material-icons">analytics</i> Аналитика
+                </a>
+            </nav>
+            <div class="provider-sidebar-footer">
+                <div class="provider-operator">
+                    <div class="provider-operator-avatar" id="operatorInitials">О</div>
+                    <div class="provider-operator-info">
+                        <div class="provider-operator-name" id="operatorName">Оператор</div>
+                        <div class="provider-operator-role">Служба поддержки</div>
+                    </div>
+                    <a href="#" onclick="logout()" style="color:#64748b;"><i class="material-icons">logout</i></a>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="provider-main">
+            <div id="dashboardPage" class="page active">
+                <div class="provider-header">
+                    <h1>Дашборд</h1>
+                    <div class="provider-header-right">
+                        <span id="currentDate"></span>
+                        <button class="action-btn action-btn-secondary" onclick="refreshData()"><i class="material-icons" style="font-size:18px;">refresh</i></button>
+                    </div>
+                </div>
+                <div class="provider-stats-grid">
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#f59e0b;"><i class="material-icons">pending</i></div><div class="stat-info"><div class="stat-value" id="statNew">0</div><div class="stat-label">Новые</div></div></div>
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#2563eb;"><i class="material-icons">engineering</i></div><div class="stat-info"><div class="stat-value" id="statProgress">0</div><div class="stat-label">В работе</div></div></div>
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#10b981;"><i class="material-icons">check_circle</i></div><div class="stat-info"><div class="stat-value" id="statResolved">0</div><div class="stat-label">Решены</div></div></div>
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#8b5cf6;"><i class="material-icons">group</i></div><div class="stat-info"><div class="stat-value" id="statClients">0</div><div class="stat-label">Клиентов</div></div></div>
+                </div>
+                <div class="ticket-list-provider">
+                    <div class="ticket-list-header">
+                        <div style="font-weight:600;">Последние заявки</div>
+                        <button class="action-btn action-btn-primary" onclick="showPage('tickets')">Все заявки</button>
+                    </div>
+                    <table class="ticket-table">
+                        <thead><tr><th>№</th><th>Клиент</th><th>Проблема</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead>
+                        <tbody id="recentTicketsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="ticketsPage" class="page">
+                <div class="provider-header">
+                    <h1>Заявки</h1>
+                </div>
+                <div class="ticket-list-provider">
+                    <div class="ticket-list-header">
+                        <div class="ticket-list-filters">
+                            <button class="ticket-filter-btn active" onclick="filterTickets('all')">Все</button>
+                            <button class="ticket-filter-btn" onclick="filterTickets('new')">Новые</button>
+                            <button class="ticket-filter-btn" onclick="filterTickets('progress')">В работе</button>
+                            <button class="ticket-filter-btn" onclick="filterTickets('resolved')">Решены</button>
+                        </div>
+                        <button class="action-btn action-btn-secondary" onclick="refreshData()"><i class="material-icons" style="font-size:18px;">refresh</i></button>
+                    </div>
+                    <table class="ticket-table">
+                        <thead><tr><th>№</th><th>Клиент</th><th>Проблема</th><th>Статус</th><th>Приоритет</th><th>Дата</th><th>Действия</th></tr></thead>
+                        <tbody id="allTicketsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="clientsPage" class="page">
+                <div class="provider-header"><h1>Клиенты</h1></div>
+                <div style="background:#ffffff;border-radius:12px;padding:20px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+                    <input type="text" id="clientSearch" placeholder="Поиск клиентов..." oninput="searchClients()" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+                </div>
+                <div class="ticket-list-provider">
+                    <table class="ticket-table">
+                        <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Тариф</th><th>Баланс</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody id="clientsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="equipmentPage" class="page">
+                <div class="provider-header"><h1>Оборудование</h1></div>
+                <div class="provider-stats-grid" style="grid-template-columns:repeat(3,1fr);">
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#2563eb;"><i class="material-icons">router</i></div><div class="stat-info"><div class="stat-value" id="routerCount">5</div><div class="stat-label">Роутеров</div></div></div>
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#10b981;"><i class="material-icons">wifi</i></div><div class="stat-info"><div class="stat-value" id="apCount">3</div><div class="stat-label">Точек доступа</div></div></div>
+                    <div class="stat-card-provider"><div class="stat-icon" style="background:#f59e0b;"><i class="material-icons">cable</i></div><div class="stat-info"><div class="stat-value" id="switchCount">2</div><div class="stat-label">Коммутаторов</div></div></div>
+                </div>
+                <div class="ticket-list-provider">
+                    <div class="ticket-list-header"><div style="font-weight:600;">База оборудования</div></div>
+                    <table class="ticket-table">
+                        <thead><tr><th>Устройство</th><th>Тип</th><th>В наличии</th><th>В работе</th></tr></thead>
+                        <tbody>
+                            <tr><td>ASUS RT-AC68U</td><td>Роутер</td><td>5 шт.</td><td>3 шт.</td></tr>
+                            <tr><td>TP-Link Archer C7</td><td>Роутер</td><td>3 шт.</td><td>2 шт.</td></tr>
+                            <tr><td>MikroTik hAP ac²</td><td>Роутер</td><td>2 шт.</td><td>1 шт.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="templatesPage" class="page">
+                <div class="provider-header"><h1>Шаблоны ответов</h1></div>
+                <div class="ticket-list-provider">
+                    <div class="ticket-list-header">
+                        <div style="font-weight:600;">Быстрые ответы</div>
+                        <button class="action-btn action-btn-primary" onclick="addTemplate()">Добавить</button>
+                    </div>
+                    <table class="ticket-table">
+                        <thead><tr><th>Название</th><th>Текст</th><th>Действия</th></tr></thead>
+                        <tbody id="templatesTable">
+                            <tr><td>Перезагрузка</td><td>Перезагрузите роутер, отключив его от питания на 30 секунд.</td><td><button class="action-btn action-btn-secondary" onclick="useTemplate(this)">Использовать</button></td></tr>
+                            <tr><td>Проверка кабеля</td><td>Проверьте целостность кабеля от роутера к компьютеру.</td><td><button class="action-btn action-btn-secondary" onclick="useTemplate(this)">Использовать</button></td></tr>
+                            <tr><td>Смена тарифа</td><td>Для смены тарифа перейдите в раздел Профиль.</td><td><button class="action-btn action-btn-secondary" onclick="useTemplate(this)">Использовать</button></td></tr>
+                            <tr><td>Проверка баланса</td><td>Проверьте баланс в разделе Профиль.</td><td><button class="action-btn action-btn-secondary" onclick="useTemplate(this)">Использовать</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="analyticsPage" class="page">
+                <div class="provider-header"><h1>Аналитика</h1></div>
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-card-title">Заявки по статусам</div>
+                        <div class="analytics-bar"><div class="analytics-bar-label">Новые</div><div class="analytics-bar-value"><div class="analytics-bar-fill" id="barNew" style="width:0%;">0</div></div></div>
+                        <div class="analytics-bar"><div class="analytics-bar-label">В работе</div><div class="analytics-bar-value"><div class="analytics-bar-fill" id="barProgress" style="width:0%;background:#2563eb;">0</div></div></div>
+                        <div class="analytics-bar"><div class="analytics-bar-label">Решены</div><div class="analytics-bar-value"><div class="analytics-bar-fill" id="barResolved" style="width:0%;background:#10b981;">0</div></div></div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-card-title">Ключевые показатели</div>
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+                            <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:#2563eb;" id="avgTime">4ч</div><div style="font-size:0.8rem;color:#64748b;">Среднее время</div></div>
+                            <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:#10b981;" id="firstContact">78%</div><div style="font-size:0.8rem;color:#64748b;">FCR</div></div>
+                            <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:#f59e0b;" id="totalTickets">0</div><div style="font-size:0.8rem;color:#64748b;">Всего заявок</div></div>
+                            <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:#8b5cf6;" id="csatScore">4.8</div><div style="font-size:0.8rem;color:#64748b;">CSAT</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="ticketModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Заявка #<span id="modalTicketId"></span></div>
+                <div class="modal-close" onclick="closeTicketModal()"><i class="material-icons">close</i></div>
+            </div>
+            <div id="ticketDetails"></div>
+            <div class="ticket-detail-section">
+                <div class="ticket-detail-label">Изменить статус</div>
+                <select class="status-select" id="statusSelect" onchange="updateTicketStatus()">
+                    <option value="new">Новая</option>
+                    <option value="progress">В работе</option>
+                    <option value="resolved">Решена</option>
+                    <option value="closed">Закрыта</option>
+                </select>
+            </div>
+            <div class="ticket-detail-section">
+                <div class="ticket-detail-label">Ответ клиенту</div>
+                <div class="reply-form">
+                    <textarea id="replyText" placeholder="Введите ответ..."></textarea>
+                    <div style="margin-top:12px;">
+                        <span class="template-chip" onclick="insertTemplate('Перезагрузите роутер')">Перезагрузка</span>
+                        <span class="template-chip" onclick="insertTemplate('Проверьте кабель')">Кабель</span>
+                        <span class="template-chip" onclick="insertTemplate('Проверьте баланс')">Баланс</span>
+                    </div>
+                    <div style="margin-top:16px;display:flex;gap:12px;">
+                        <button class="action-btn action-btn-primary" onclick="sendReply()"><i class="material-icons" style="font-size:18px;">send</i> Отправить</button>
+                        <button class="action-btn action-btn-success" onclick="closeTicketModal()"><i class="material-icons" style="font-size:18px;">check</i> Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="customerModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="customerName">Клиент</div>
+                <div class="modal-close" onclick="closeCustomerCard()"><i class="material-icons">close</i></div>
+            </div>
+            <div class="customer-info-grid" style="margin-bottom:20px;">
+                <div class="customer-info-item"><div class="customer-info-label">Email</div><div class="customer-info-value" id="customerEmail">-</div></div>
+                <div class="customer-info-item"><div class="customer-info-label">Тариф</div><div class="customer-info-value" id="customerTariff">-</div></div>
+                <div class="customer-info-item"><div class="customer-info-label">Баланс</div><div class="customer-info-value" id="customerBalance">-</div></div>
+                <div class="customer-info-item"><div class="customer-info-label">Скорость</div><div class="customer-info-value" id="customerSpeed">-</div></div>
+            </div>
+            <div style="font-weight:600;margin-bottom:12px;">История заявок</div>
+            <div id="customerHistory"></div>
+        </div>
+    </div>
+    
+    <div id="toast" style="display:none;position:fixed;bottom:30px;right:30px;background:#10b981;border-radius:12px;padding:16px 24px;color:white;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+        <span id="toastMessage">Успешно!</span>
+    </div>
+    
+    <script src="js/app.js"></script>
+    <script src="js/provider.js"></script>
+</body>
+</html>
