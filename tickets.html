@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки - MegaNet</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="material-icons">wifi</i>
+            </div>
+            MegaNet
+        </div>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')">
+            <i class="material-icons" style="font-size:28px;">apps</i>
+        </button>
+            <i class="material-icons">menu</i>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-item">
+                <i class="material-icons">home</i>
+                Главная
+            </a>
+            <a href="tickets.html" class="nav-item active">
+                <i class="material-icons">confirmation_number</i>
+                Заявки
+            </a>
+            <a href="diagnose.html" class="nav-item">
+                <i class="material-icons">speed</i>
+                Диагностика
+            </a>
+            <a href="knowledge.html" class="nav-item">
+                <i class="material-icons">menu_book</i>
+                База знаний
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="material-icons">person</i>
+                Профиль
+            </a>
+            <a href="address.html" class="nav-item">
+                <i class="material-icons">location_on</i>
+                Покрытие
+            </a>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar" id="userInitials"></div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="material-icons">inbox</i>
+                </div>
+                <div>
+                    <div class="stat-value" id="totalTickets">0</div>
+                    <div class="stat-label">Всего заявок</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="material-icons">pending</i>
+                </div>
+                <div>
+                    <div class="stat-value" id="newTickets">0</div>
+                    <div class="stat-label">Новые</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="material-icons">engineering</i>
+                </div>
+                <div>
+                    <div class="stat-value" id="progressTickets">0</div>
+                    <div class="stat-label">В работе</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="material-icons">check_circle</i>
+                </div>
+                <div>
+                    <div class="stat-value" id="resolvedTickets">0</div>
+                    <div class="stat-label">Решённые</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Мои заявки</div>
+                <button class="btn btn-primary" onclick="openNewTicketModal()">
+                    <i class="material-icons">add</i>
+                    Новая заявка
+                </button>
+            </div>
+            <div id="ticketsList" style="margin-top: 0;">
+                <div class="empty-state">
+                    <i class="material-icons">inbox</i>
+                    <p>У вас пока нет заявок</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-title">MegaNet</div>
+                <div class="footer-text">© 2026 Все права защищены</div>
+            </div>
+            <div class="footer-section">
+                <a href="tel:88001234567" class="footer-link">8 800 123-45-67</a>
+                <a href="mailto:support@meganet.ru" class="footer-link">support@meganet.ru</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="newTicketModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99998;pointer-events:auto;">
+        <div style="background:var(--bg-card);border-radius:20px;padding:30px;max-width:500px;width:90%;margin:auto;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:var(--shadow-lg);pointer-events:auto;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+                <div style="font-size:1.4rem;font-weight:700;">Новая заявка</div>
+                <a href="#" onclick="closeNewTicketModal();return false;" style="color:var(--text-secondary);cursor:pointer;text-decoration:none;padding:4px;">
+                    <i class="material-icons">close</i>
+                </a>
+            </div>
+            <form id="ticketForm" onsubmit="submitTicket(event)">
+                <div class="form-group">
+                    <label class="form-label">Категория проблемы</label>
+                    <select class="browser-default" id="ticketCategory" required style="padding:12px;border:2px solid var(--border);border-radius:10px;background:white;color:black;">
+                        <option value="">Выберите категорию</option>
+                        <option value="no-internet">Нет интернета</option>
+                        <option value="slow-speed">Низкая скорость</option>
+                        <option value="no-connect">Не подключается</option>
+                        <option value="equipment">Оборудование</option>
+                        <option value="billing">Оплата/Счёт</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Приоритет</label>
+                    <select class="browser-default" id="ticketPriority" required style="padding:12px;border:2px solid var(--border);border-radius:10px;background:white;color:black;">
+                        <option value="normal">Обычный</option>
+                        <option value="high">Высокий</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание проблемы</label>
+                    <textarea class="form-textarea" id="ticketDescription" placeholder="Опишите вашу проблему подробно..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="material-icons">send</i>
+                    Отправить заявку
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" style="display:none;position:fixed;bottom:30px;right:30px;background:#10b981;border-radius:12px;padding:16px 24px;color:white;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+        <span id="toastMessage" style="font-weight:500;">Успешно!</span>
+    </div>
+
+    <a href="#" onclick="document.getElementById('chatModal').style.display='block'; return false;" style="position:fixed;bottom:30px;right:30px;width:60px;height:60px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:99999;box-shadow:0 4px 20px rgba(16,185,129,0.4);">
+        <i class="material-icons" style="color:white;font-size:24px;">chat</i>
+    </a>
+
+    <div id="chatModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99998;">
+        <div style="background:var(--bg-card);border-radius:20px;padding:24px;max-width:400px;width:90%;max-height:80vh;margin:auto;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <div style="font-size:1.3rem;font-weight:700;">Чат поддержки</div>
+                <a href="#" onclick="document.getElementById('chatModal').style.display='none'; return false;" style="color:var(--text-secondary);cursor:pointer;text-decoration:none;">
+                    <i class="material-icons">close</i>
+                </a>
+            </div>
+            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:15px;">
+                <div class="chat-message support">
+                    <div class="chat-bubble">Здравствуйте! Чем могу помочь?</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex:1;padding:12px;border:2px solid var(--border);border-radius:25px;font-size:14px;">
+                <button class="btn btn-primary" id="chatSendBtn" style="padding:12px 20px;">
+                    <i class="material-icons">send</i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/tickets.js"></script>
+</body>
+</html>

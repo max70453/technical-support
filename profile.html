@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - MegaNet</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="material-icons">wifi</i>
+            </div>
+            MegaNet
+        </div>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')">
+            <i class="material-icons" style="font-size:28px;">apps</i>
+        </button>
+            <i class="material-icons">menu</i>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-item">
+                <i class="material-icons">home</i>
+                Главная
+            </a>
+            <a href="tickets.html" class="nav-item">
+                <i class="material-icons">confirmation_number</i>
+                Заявки
+            </a>
+            <a href="diagnose.html" class="nav-item">
+                <i class="material-icons">speed</i>
+                Диагностика
+            </a>
+            <a href="knowledge.html" class="nav-item">
+                <i class="material-icons">menu_book</i>
+                База знаний
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <i class="material-icons">person</i>
+                Профиль
+            </a>
+        </div>
+        <div class="user-info">
+            <button class="btn-logout" onclick="logout()">
+                <i class="material-icons">logout</i>
+                Выйти
+            </button>
+            <div class="user-avatar" id="userInitials"></div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="card-row">
+            <div class="card">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar"></div>
+                    <div>
+                        <div class="profile-name" id="profileName"></div>
+                        <div class="profile-email" id="profileEmail"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-label">Текущий баланс</div>
+                <div class="balance-value" id="balanceValue"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Информация об услугах</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Тариф</div>
+                <div class="info-value" id="currentTariff"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Скорость</div>
+                <div class="info-value" id="speedValue"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Статус</div>
+                <div class="info-value info-value-active">Активен</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Абонентская плата</div>
+                <div class="info-value" id="priceValue"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Следующее списание</div>
+                <div class="info-value" id="nextPayment"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Доступные тарифы</div>
+            </div>
+            <div class="tariff-grid">
+                <div class="tariff-card" onclick="selectTariff(this, 'Эконом 30', 30, 290)">
+                    <div class="tariff-name">Эконом 30</div>
+                    <div class="tariff-speed">30 <span>Мбит/с</span></div>
+                    <div class="tariff-price">290 <span>₽/мес</span></div>
+                    <button class="btn btn-secondary">Выбрать</button>
+                </div>
+                <div class="tariff-card active" onclick="selectTariff(this, 'Домашний 100', 100, 490)">
+                    <div class="tariff-name">Домашний 100</div>
+                    <div class="tariff-speed">100 <span>Мбит/с</span></div>
+                    <div class="tariff-price">490 <span>₽/мес</span></div>
+                    <button class="btn btn-secondary">Текущий</button>
+                </div>
+                <div class="tariff-card" onclick="selectTariff(this, 'Премиум 300', 300, 790)">
+                    <div class="tariff-name">Премиум 300</div>
+                    <div class="tariff-speed">300 <span>Мбит/с</span></div>
+                    <div class="tariff-price">790 <span>₽/мес</span></div>
+                    <button class="btn btn-secondary">Выбрать</button>
+                </div>
+                <div class="tariff-card" onclick="selectTariff(this, 'Гигабит 1000', 1000, 1290)">
+                    <div class="tariff-name">Гигабит 1000</div>
+                    <div class="tariff-speed">1000 <span>Мбит/с</span></div>
+                    <div class="tariff-price">1290 <span>₽/мес</span></div>
+                    <button class="btn btn-secondary">Выбрать</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-title">MegaNet</div>
+                <div class="footer-text">© 2026 Все права защищены</div>
+            </div>
+            <div class="footer-section">
+                <a href="tel:88001234567" class="footer-link">8 800 123-45-67</a>
+                <a href="mailto:support@meganet.ru" class="footer-link">support@meganet.ru</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" style="display:none;position:fixed;bottom:30px;right:30px;background:#10b981;border-radius:12px;padding:16px 24px;color:white;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+        <span id="toastMessage" style="font-weight:500;">Успешно!</span>
+    </div>
+
+    <a href="#" onclick="document.getElementById('chatModal').style.display='block'; return false;" style="position:fixed;bottom:30px;right:30px;width:60px;height:60px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:99999;box-shadow:0 4px 20px rgba(16,185,129,0.4);">
+        <i class="material-icons" style="color:white;font-size:24px;">chat</i>
+    </a>
+
+    <div id="chatModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99998;">
+        <div style="background:var(--bg-card);border-radius:20px;padding:24px;max-width:400px;width:90%;max-height:80vh;margin:auto;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <div style="font-size:1.3rem;font-weight:700;">Чат поддержки</div>
+                <a href="#" onclick="document.getElementById('chatModal').style.display='none'; return false;" style="color:var(--text-secondary);cursor:pointer;text-decoration:none;">
+                    <i class="material-icons">close</i>
+                </a>
+            </div>
+            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:15px;">
+                <div class="chat-message support">
+                    <div class="chat-bubble">Здравствуйте! Чем могу помочь?</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex:1;padding:12px;border:2px solid var(--border);border-radius:25px;font-size:14px;">
+                <button class="btn btn-primary" id="chatSendBtn" style="padding:12px 20px;">
+                    <i class="material-icons">send</i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>
